@@ -1,0 +1,657 @@
+<odoo>
+    <data>
+        <template id="portal_searchbar_crm" inherit_id="portal.portal_searchbar">
+            <xpath expr="//div[@t-if='searchbar_sortings']" position="before">
+                <div t-if="reset_url" class="form-inline mr-lg-5">
+                        <div class="btn-group">
+                            <a t-att-href="reset_url" class="btn btn-secondary btn-sm">
+                                Clear All
+                            </a>
+                        </div>
+                    </div>
+            </xpath>
+        </template>
+
+        <template id="portal_my_home_menu_crm" name="Portal layout : CRM menu entries"
+                  inherit_id="portal.portal_breadcrumbs" priority="25">
+            <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+                <li t-if="page_name == 'crm'"
+                    t-attf-class="breadcrumb-item #{'active ' if not crm_recs else ''}">
+                    <a t-if="crm_recs" t-attf-href="/my/crm?{{ keep_query() }}">Assigned BID's</a>
+                    <t t-else="">Assigned BID's</t>
+                </li>
+                <li t-if="crm_recs and page_name == 'crm'" class="breadcrumb-item active">
+                    <t t-esc="crm_recs.name"/>
+                </li>
+            </xpath>
+        </template>
+
+        <template id="portal_my_home_crm" name="Portal My Home : CRM entry" inherit_id="portal.portal_my_home"
+                  priority="25">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-if="crm_count" t-call="portal.portal_docs_entry">
+                    <t t-set="title">Assigned BID's</t>
+                    <t t-set="url" t-value="'/my/crm'"/>
+                    <t t-set="count" t-value="crm_count"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="crm__portal_template_list" name="Portal: My Assigned Orders">
+            <t t-call="portal.portal_layout">
+                <t t-call="portal.portal_searchbar">
+                    <t t-set="title">Assigned BID's</t>
+                </t>
+                <t t-if="not grouped_tasks">
+                    <div class="alert alert-warning mt8" role="alert">
+                        There are no Assigned BID's.
+                    </div>
+                </t>
+                <t t-if="grouped_tasks">
+                    <t t-call="portal.portal_table">
+                        <t t-foreach="grouped_tasks" t-as="leads">
+                            <thead>
+                                <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
+                                    <th t-if="groupby == 'none'">BID #</th>
+                                    <th t-elif="groupby == 'stage'">
+                                        <em class="font-weight-normal text-muted">
+                                            Stage:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'date'">
+                                        <em class="font-weight-normal text-muted">
+                                            Closing Day:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'date_week'">
+                                        <em class="font-weight-normal text-muted">
+                                            Closing Week:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'date_month'">
+                                        <em class="font-weight-normal text-muted">
+                                            Closing Month:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'date_quarter'">
+                                        <em class="font-weight-normal text-muted">
+                                            Closing Quarter:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'date_year'">
+                                        <em class="font-weight-normal text-muted">
+                                            Closing Year:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'create_date'">
+                                        <em class="font-weight-normal text-muted">
+                                            Create Day:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'create_week'">
+                                        <em class="font-weight-normal text-muted">
+                                            Create Week:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'create_month'">
+                                        <em class="font-weight-normal text-muted">
+                                            Create Month:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'create_quarter'">
+                                        <em class="font-weight-normal text-muted">
+                                            Create Quarter:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th t-elif="groupby == 'create_year'">
+                                        <em class="font-weight-normal text-muted">
+                                            Create Year:
+                                        </em>
+                                        <span t-esc="leads[0]"/>
+                                    </th>
+                                    <th>Stage</th>
+                                    <th>Given Date &amp; Time</th>
+                                    <th>Category</th>
+                                    <th>QTY</th>
+                                    <th>Approx Revenue</th>
+                                    <th>Bid Close Date &amp; Time</th>
+                                    <th>Priority</th>
+                                    <th>Catalog Paired</th>
+                                    <th>Participated</th>
+                                    <th>L1</th>
+                                    <th>Contract Recvd</th>
+                                    <th>Lost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="leads[1]" t-as="lead">
+                                    <tr>
+                                        <td>
+                                            <a t-attf-href="#{lead.access_url}">
+                                                <t t-esc="lead.name"/>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span t-field="lead.stage_id"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="lead.create_date"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="lead.x_studio_product_category"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="lead.x_studio_quantity"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="lead.planned_revenue"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="lead.bid_closing_date"/>
+                                        </td>
+                                        <td>
+                                            <t t-foreach="range(int(lead.priority))" t-as="okok">
+                                                <i class="fa fa-star" style="color:gold;"/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" t-att-checked="lead.is_paired_catelog" readonly=""
+                                                   onclick="return false;" onkeydown="return false;"/>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" t-att-checked="lead.is_participated"
+                                                   onclick="return false;" onkeydown="return false;" readonly=""/>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" t-att-checked="lead.is_l1" onclick="return false;"
+                                                   onkeydown="return false;" readonly=""/>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" t-att-checked="lead.is_contract_received"
+                                                   readonly="" onclick="return false;" onkeydown="return false;"/>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" t-att-checked="lead.is_bid_lost" readonly=""
+                                                   onclick="return false;" onkeydown="return false;"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </t>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <template id="crm__portal_template_form" name="CRM Portal Template" inherit_id="portal.portal_sidebar"
+                  primary="True">
+            <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+                <div class="row mt16 o_portal_crm_sidebar">
+                    <div id="quote_content" class="col-12 col-lg justify-content-end">
+
+                        <div t-attf-class="card #{'pb-5' if report_type == 'html' else ''}">
+                            <div t-call="ki_crm_portal.crm_portal_content"/>
+                        </div>
+
+                        <div id="crm_communication" class="mt-4">
+                            <h2>Communication</h2>
+                            <t t-call="portal.message_thread">
+                                <t t-set="object" t-value="crm_recs"/>
+                            </t>
+                        </div>
+
+                    </div>
+                </div>
+            </xpath>
+        </template>
+
+        <template id="crm_portal_content" name="CRM Portal Content">
+            <!-- Intro -->
+            <div id="introduction" t-attf-class="pb-2 pt-3 #{'card-header bg-white' if report_type == 'html' else ''}">
+                <h2 class="my-0">
+                    <em t-esc="crm_recs.name"/>
+                </h2>
+                <h5 class="mt16">
+                    <span t-field="crm_recs.planned_revenue"
+                          t-options='{"widget": "monetary", "display_currency": crm_recs.company_currency}'/>
+                    <span t-if="not crm_recs.active" class="badge-pill badge-danger float-right">Lost</span>
+                    <span t-if="crm_recs.active" class="badge-pill badge-success float-right">
+                        <span t-field="crm_recs.stage_id"/>
+                    </span>
+                </h5>
+            </div>
+            <div class="card-header">
+<!--                <button t-if="crm_recs and not crm_recs.is_paired_catelog" type="button" class="btn btn-primary"-->
+<!--                        data-toggle="modal" t-att-data-target="'#bid_paired_cate_rec_'+ str(crm_recs.id)">-->
+<!--                    Paired Catalog-->
+<!--                </button>-->
+                <a t-att-href="'/bid/button/'+ str(crm_recs.id) + '?paired_catelog=true'"
+                   t-if="crm_recs and not crm_recs.is_paired_catelog"
+                   class="btn btn-primary">Catalog Paired
+                </a>
+                <button t-if="crm_recs and not crm_recs.is_participated" type="button" class="btn btn-primary"
+                        data-toggle="modal" t-att-data-target="'#bid_partici_'+ str(crm_recs.id)">
+                    Participated
+                </button>
+                <a t-att-href="'/bid/button/'+ str(crm_recs.id) + '?is_l1=true'"
+                   t-if="crm_recs and not crm_recs.is_l1"
+                   class="btn btn-primary">L1
+                </a>
+                <button t-if="crm_recs and not crm_recs.is_contract_received" type="button" class="btn btn-primary"
+                        data-toggle="modal" t-att-data-target="'#bid_contract_rec_'+ str(crm_recs.id)">
+                    Contract Recvd
+                </button>
+                <button t-if="crm_recs and not crm_recs.is_bid_lost" type="button" class="btn btn-danger"
+                        data-toggle="modal" t-att-data-target="'#bid_lost_'+ str(crm_recs.id)">
+                    Lost
+                </button>
+                <div t-if="crm_recs and not crm_recs.is_participated" class="modal fade"
+                     t-att-id="'bid_partici_'+ str(crm_recs.id)" tabindex="-1" role="dialog"
+                     aria-labelledby="partici" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <form t-att-action="'/bid/button/'+ str(crm_recs.id)" method="post"
+                              enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="participated" t-att-value="true"/>
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="partici_label">Attach Bid Participation Document</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group row form-field">
+                                        <label class="col-lg-3 col-md-4 col-form-label" for="participated_attach">
+                                            Upload Document
+                                        </label>
+                                        <div class="col-lg-7 col-md-8">
+                                            <input type="file"
+                                                   class="form-control"
+                                                   name="participated_attach"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div t-if="crm_recs and not crm_recs.is_contract_received" class="modal fade"
+                     t-att-id="'bid_contract_rec_'+ str(crm_recs.id)" tabindex="-1" role="dialog"
+                     aria-labelledby="contract_rec" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <form t-att-action="'/bid/button/'+ str(crm_recs.id)" method="post"
+                              enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="contract_rcvd" t-att-value="true"/>
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="contract_rec_label">Attach Contract Copy</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group row form-field">
+                                        <label class="col-lg-3 col-md-4 col-form-label" for="contract_attach">
+                                            Upload Copy
+                                        </label>
+                                        <div class="col-lg-7 col-md-8">
+                                            <input type="file"
+                                                   class="form-control"
+                                                   name="contract_attach"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div t-if="crm_recs and not crm_recs.is_bid_lost" class="modal fade"
+                     t-att-id="'bid_lost_'+ str(crm_recs.id)" tabindex="-1" role="dialog"
+                     aria-labelledby="lost_reason_label" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <form t-att-action="'/bid/button/'+ str(crm_recs.id) +'?lost=true'" method="post"
+                              enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="lost_reason_label">Lost Reason</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group row form-field">
+                                        <label class="col-lg-3 col-md-4 col-form-label" for="reason_id">
+                                            Lost Reason
+                                        </label>
+                                        <div class="col-lg-7 col-md-8">
+                                            <select name="reason_id" t-attf-class="form-control" required="">
+                                                <option value="">Lost Reason...</option>
+                                                <t t-foreach="lost_selection or []" t-as="reason">
+                                                    <option t-att-value="reason.id">
+                                                        <t t-esc="reason.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div t-attf-class="#{'card-body' if report_type == 'html' else ''}">
+                <!-- Informations -->
+                <div id="informations">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <strong>Customer:</strong>
+                                </div>
+                                <div class="col-lg-8">
+                                    <span t-field="crm_recs.partner_id"/>
+                                </div>
+                                <div class="col-lg-4">
+                                    <strong>Email:</strong>
+                                </div>
+                                <div class="col-lg-8">
+                                    <i t-if="crm_recs.is_blacklisted" class="fa fa-ban" style="color: red;" role="img"
+                                       title="This email is blacklisted for mass mailing"
+                                       aria-label="Blacklisted"/>
+                                    <span t-field="crm_recs.partner_id.email" t-if="crm_recs.partner_id"/>
+                                </div>
+                                <div class="col-lg-4" t-if="'x_studio_mobile' in crm_recs._fields">
+                                    <strong>Mobile:</strong>
+                                </div>
+                                <div class="col-lg-8" t-if="'x_studio_mobile' in crm_recs._fields">
+                                    <span t-field="crm_recs.x_studio_mobile"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <strong>Quantity:</strong>
+                                </div>
+                                <div class="col-lg-8">
+                                    <span t-field="crm_recs.x_studio_quantity" t-options="{'widget': 'integer'}"/>
+                                </div>
+                                <div class="col-lg-4" t-if="'x_studio_product_category' in crm_recs._fields">
+                                    <strong>Product Category:</strong>
+                                </div>
+                                <div t-if="'x_studio_product_category' in crm_recs._fields" class="col-lg-8">
+                                    <span t-field="crm_recs.x_studio_product_category"/>
+                                </div>
+                                <div class="col-lg-4">
+                                    <strong>Expected Revenue:</strong>
+                                </div>
+                                <div class="col-lg-8">
+                                    <span t-field="crm_recs.value"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt16">
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <strong>Salesperson:</strong>
+                                </div>
+                                <div class="col-lg-8">
+                                    <span t-field="crm_recs.user_id"/>
+                                </div>
+                                <div class="col-lg-4">
+                                    <strong>Sales Team:</strong>
+                                </div>
+                                <div class="col-lg-8">
+                                    <span t-field="crm_recs.team_id"/>
+                                </div>
+                                <div class="col-lg-4">
+                                    <strong>Attachments:</strong>
+                                </div>
+                                <div class="col-lg-8">
+                                    <a t-if="len(attachments) > 0" data-toggle="modal"
+                                       t-attf-data-target="#crm_modal_#{crm_recs.id}" href="#"
+                                       title="Attachment">
+                                        <i style="color: #7C7BAD; font-size: 1rem;"
+                                           class="fa fa-paperclip"/>
+                                        <span style="color: #7C7BAD;"
+                                              t-esc="len(attachments)"/>
+                                    </a>
+                                    <div t-if="len(attachments) == 0">
+                                        <i style="color: #7C7BAD; font-size: 1rem;"
+                                           class="fa fa-paperclip"/>
+                                        <span style="color: #7C7BAD;"
+                                              t-esc="len(attachments)"/>
+                                    </div>
+                                    <div class="modal fade crm_multiple_attachments"
+                                         t-attf-id="crm_modal_#{crm_recs.id}" tabindex="-1"
+                                         role="dialog">
+                                        <div class="modal-dialog modal-dialog-centered" role="document"
+                                             style="min-width:40%;">
+                                            <div class="modal-content" style="height: 80%;">
+                                                <div class="modal-header"
+                                                     style="background-color: #7C7BAD;color: white;">
+                                                    <h5 class="modal-title text-center">Attachments</h5>
+                                                </div>
+                                                <div class="modal-body" id="attachment_crm">
+                                                    <div class="row"
+                                                         style="display: flex;flex-wrap: wrap;">
+                                                        <t t-foreach="attachments"
+                                                           t-as="file">
+                                                            <div class="column crm_hover"
+                                                                 onmouseover="this.style.background='#adb5bd';"
+                                                                 onmouseout="this.style.background='white';"
+                                                                 style="flex: 100%;padding: 5px 5px 5px 5px;">
+                                                                <t t-set="type"
+                                                                   t-value="file.mimetype and file.mimetype.split('/')[0]"/>
+                                                                <t t-set="ext"
+                                                                   t-value="file.name and file.name.split('.')[1]"/>
+                                                                <t t-set="has_preview"
+                                                                   t-value="type == 'image'"/>
+                                                                <div class="o_attachment_wrap">
+                                                                    <div class="o_image_box float-left"
+                                                                         t-att-data-id="file.id">
+                                                                        <a t-attf-href="/web/content/#{file.id}?download=true&amp;access_token=#{file.access_token}"
+                                                                           t-att-title="'Download ' + file.name"
+                                                                           aria-label="Download">
+                                                                            <img t-if="has_preview"
+                                                                                 style="margin-top: 8px;vertical-align: middle;"
+                                                                                 t-attf-src="/web/content/#{file.id}?access_token=#{file.access_token}"
+                                                                                 alt="Document"
+                                                                                 class="o_attachment_image img-fluid"/>
+                                                                            <span t-else=""
+                                                                                  class="o_image o_hover"
+                                                                                  t-att-data-mimetype="file.mimetype"
+                                                                                  t-att-data-ext="ext"
+                                                                                  role="img"/>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div t-if="not has_preview"
+                                                                         class="caption">
+                                                                        <a class="ml4"
+                                                                           t-attf-href="/web/content/#{file.id}?download=true&amp;access_token=#{file.access_token}"
+                                                                           t-att-title="'Download ' + file.name">
+                                                                            <t t-esc='file.name'/>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div t-if="not has_preview"
+                                                                         class="caption small">
+                                                                        <a class="ml4 small text-uppercase"
+                                                                           t-attf-href="/web/content/#{file.id}?download=true&amp;access_token=#{file.access_token}"
+                                                                           t-att-title="'Download ' + file.name">
+                                                                            <b>
+                                                                                <t t-esc='ext'/>
+                                                                            </b>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </t>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary"
+                                                            data-dismiss="modal">Close
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <strong>Priority:</strong>
+                                </div>
+                                <div class="col-lg-8">
+                                    <a t-if="crm_recs.priority in ['1','2','3']" t-attf-href="/my/crm/#{crm_recs.id}?priority=0&amp;{{ keep_query() }}"><i class="fa fa-star" style="color:gold;"/></a>
+                                    <a t-if="crm_recs.priority in ['2','3']" t-attf-href="/my/crm/#{crm_recs.id}?priority=1&amp;{{ keep_query() }}"><i class="fa fa-star" style="color:gold;"/></a>
+                                    <a t-if="crm_recs.priority in ['3']" t-attf-href="/my/crm/#{crm_recs.id}?priority=2&amp;{{ keep_query() }}"><i class="fa fa-star" style="color:gold;"/></a>
+                                    <a t-if="crm_recs.priority in ['0']" t-attf-href="/my/crm/#{crm_recs.id}?priority=1&amp;{{ keep_query() }}"><i class="fa fa-star" style="color:lightgrey;"/></a>
+                                    <a t-if="crm_recs.priority in ['0','1']" t-attf-href="/my/crm/#{crm_recs.id}?priority=2&amp;{{ keep_query() }}"><i class="fa fa-star" style="color:lightgrey;"/></a>
+                                    <a t-if="crm_recs.priority in ['0','1','2']" t-attf-href="/my/crm/#{crm_recs.id}?priority=3&amp;{{ keep_query() }}"><i class="fa fa-star" style="color:lightgrey;"/></a>
+                                </div>
+                                <t t-if="not crm_recs.active">
+                                    <div class="col-lg-4">
+                                        <strong>Lost Reason:</strong>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <span t-field="crm_recs.lost_reason"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt64">
+                    <ul class="nav nav-tabs" style="width:100%">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#internal_note">Internal Note
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#gem_field">GeM Fields
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#gem_customer">GeM Customer
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" style="width:100%">
+                        <div id="internal_note" class="tab-pane active">
+                            <span t-field="crm_recs.description"/>
+                        </div>
+                        <div id="gem_field" class="tab-pane">
+                            <div class="row mt16" style="margin-right:0px;margin-left:0px;">
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <div class="col-lg-4" t-if="'x_studio_gem_model_no' in crm_recs._fields">
+                                            <strong>GeM Model No.:</strong>
+                                        </div>
+                                        <div class="col-lg-8" t-if="'x_studio_gem_model_no' in crm_recs._fields">
+                                            <span t-field="crm_recs.x_studio_gem_model_no"/>
+                                        </div>
+                                        <div class="col-lg-4" t-if="'x_studio_gem_sku' in crm_recs._fields">
+                                            <strong>GeM SKU:</strong>
+                                        </div>
+                                        <div class="col-lg-8" t-if="'x_studio_gem_sku' in crm_recs._fields">
+                                            <span t-field="crm_recs.x_studio_gem_sku"/>
+                                        </div>
+                                        <div class="col-lg-4" t-if="'x_studio_catalog_id' in crm_recs._fields">
+                                            <strong>GeM Catalog ID:</strong>
+                                        </div>
+                                        <div class="col-lg-8" t-if="'x_studio_catalog_id' in crm_recs._fields">
+                                            <span t-field="crm_recs.x_studio_catalog_id"/>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <strong>Bid Closing Date &amp; Time:</strong>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <span t-field="crm_recs.bid_closing_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <div class="col-lg-4"
+                                             t-if="'x_studio_price_1_with_win_10_pro_os' in crm_recs._fields">
+                                            <strong>Price 1 (With Win 10 Pro OS):</strong>
+                                        </div>
+                                        <div class="col-lg-8"
+                                             t-if="'x_studio_price_1_with_win_10_pro_os' in crm_recs._fields">
+                                            <span t-field="crm_recs.x_studio_price_1_with_win_10_pro_os"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="gem_customer" class="tab-pane">
+                            <div class="row mt16" style="margin-right:0px;margin-left:0px;">
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <strong>GeM Customer Name:</strong>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <span t-if="crm_recs.gem_customer_id" t-field="crm_recs.gem_customer_id"/>
+                                            <span t-else="" t-field="crm_recs.gem_customer_name"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <strong>Customer City:</strong>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <span t-field="crm_recs.customer_city"/>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <strong>Customer Pincode:</strong>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <span t-field="crm_recs.customer_pincode"/>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <strong>Customer State:</strong>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <span t-field="crm_recs.customer_state_id"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </data>
+</odoo>
